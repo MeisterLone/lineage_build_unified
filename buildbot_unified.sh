@@ -148,6 +148,7 @@ validate_treble_identity() {
         "$product_prop:ro.product.product.device=C10" \
         "$product_prop:ro.product.product.name=C10US" \
         "$product_prop:ro.product.product.model=C10" \
+        "$product_prop:ro.build.display.id=863C_C10_20240619" \
         "$product_prop:ro.build.characteristics=tablet" \
         "$system_ext_prop:ro.product.system_ext.brand=FancyDay" \
         "$system_ext_prop:ro.product.system_ext.manufacturer=FancyDay" \
