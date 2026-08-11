@@ -143,6 +143,7 @@ validate_treble_identity() {
         "$system_prop:ro.system.build.fingerprint=FancyDay/C10US/C10:14/UP1A.231105.001.A1/20240316:user/release-keys" \
         "$system_prop:ro.build.description=a523_y83_arm64-user 14 UP1A.231105.001.A1 20240316 release-keys" \
         "$system_prop:ro.build.display.id=863C_C10_20240619" \
+        "$system_prop:service.adb.root=1" \
         "$system_prop:ro.lmk.use_new_strategy=true" \
         "$system_prop:ro.lmk.use_psi=true" \
         "$product_prop:ro.product.product.brand=FancyDay" \
