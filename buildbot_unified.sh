@@ -127,6 +127,43 @@ build_device() {
     mv $OUT/lineage-*.zip ~/build-output/lineage-$LINEAGE_VERSION-$BUILD_DATE-UNOFFICIAL-${1}$($PERSONAL && echo "-personal" || echo "").zip
 }
 
+validate_treble_identity() {
+    local system_prop="$OUT/system/build.prop"
+    local product_prop="$OUT/system/product/etc/build.prop"
+    local system_ext_prop="$OUT/system/system_ext/etc/build.prop"
+    local expected
+
+    for expected in \
+        "$system_prop:ro.product.system.brand=FancyDay" \
+        "$system_prop:ro.product.system.manufacturer=FancyDay" \
+        "$system_prop:ro.product.system.device=C10" \
+        "$system_prop:ro.product.system.name=C10US" \
+        "$system_prop:ro.product.system.model=C10" \
+        "$system_prop:ro.build.fingerprint=FancyDay/C10US/C10:14/UP1A.231105.001.A1/20240316:user/release-keys" \
+        "$system_prop:ro.system.build.fingerprint=FancyDay/C10US/C10:14/UP1A.231105.001.A1/20240316:user/release-keys" \
+        "$system_prop:ro.build.description=a523_y83_arm64-user 14 UP1A.231105.001.A1 20240316 release-keys" \
+        "$system_prop:ro.build.display.id=863C_C10_20240619" \
+        "$product_prop:ro.product.product.brand=FancyDay" \
+        "$product_prop:ro.product.product.manufacturer=FancyDay" \
+        "$product_prop:ro.product.product.device=C10" \
+        "$product_prop:ro.product.product.name=C10US" \
+        "$product_prop:ro.product.product.model=C10" \
+        "$product_prop:ro.build.characteristics=tablet" \
+        "$system_ext_prop:ro.product.system_ext.brand=FancyDay" \
+        "$system_ext_prop:ro.product.system_ext.manufacturer=FancyDay" \
+        "$system_ext_prop:ro.product.system_ext.device=C10" \
+        "$system_ext_prop:ro.product.system_ext.name=C10US" \
+        "$system_ext_prop:ro.product.system_ext.model=C10"
+    do
+        local file="${expected%%:*}"
+        local property="${expected#*:}"
+        if ! grep -Fxq "$property" "$file"; then
+            echo "Identity validation failed: $property not found in $file" >&2
+            exit 1
+        fi
+    done
+}
+
 build_treble() {
     case "${1}" in
         ("A64VN") TARGET=a64_bvN;;
@@ -140,6 +177,7 @@ build_treble() {
     lunch lineage_${TARGET}-${aosp_target_release}-userdebug
     make installclean
     WITH_ADB_INSECURE=true make -j$(lscpu -b -p=Core,Socket | grep -v '^#' | sort -u | wc -l) systemimage
+    validate_treble_identity
     SIGNED=false
     if [ ${SIGNABLE} = true ] && [[ ${TARGET} == *_bg? ]]
     then
