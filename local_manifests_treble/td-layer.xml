@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest>
+  <remote name="td-c10" fetch="https://github.com/TrebleDroid/" />
+  <remote name="phh-c10" fetch="https://github.com/phhusson/" />
+  <remote name="github-c10" fetch="https://github.com/" />
+  <remote name="gitlab-c10" fetch="https://gitlab.com/" />
+
+  <project path="device/phh/treble" name="device_phh_treble" remote="td-c10" revision="android-16.0" />
+  <project path="treble_app" name="treble_app" remote="td-c10" revision="master" />
+  <project path="vendor/hardware_overlay" name="vendor_hardware_overlay" remote="td-c10" revision="pie" />
+  <project path="vendor/interfaces" name="vendor_interfaces" remote="td-c10" revision="android-16.0" />
+
+  <project path="vendor/vndk-tests" name="vendor_vndk-tests" remote="phh-c10" revision="master" />
+  <project path="vendor/lptools" name="vendor_lptools" remote="phh-c10" revision="master" />
+  <project path="vendor/magisk" name="vendor_magisk" remote="phh-c10" revision="android-10.0" />
+
+  <project path="packages/apps/QcRilAm" name="AndyCGYan/android_packages_apps_QcRilAm" remote="github-c10" revision="master" />
+  <project path="prebuilts/vndk/v28" name="platform/prebuilts/vndk/v28" remote="aosp" clone-depth="1" revision="204f1bad00aaf480ba33233f7b8c2ddaa03155dd" />
+  <project path="prebuilts/vndk/v29" name="platform_prebuilts_vndk_v29" remote="td-c10" revision="android-16.0.0_r2-td" clone-depth="1" />
+
+  <project path="vendor/gapps" name="MindTheGapps/vendor_gapps" remote="gitlab-c10" revision="baklava" />
+</manifest>

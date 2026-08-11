@@ -1,6 +1,6 @@
 #!/bin/bash
 echo ""
-echo "LineageOS 21 Unified Buildbot"
+echo "LineageOS 23.2 TrebleDroid Unified Buildbot"
 echo "Executing in 5 seconds - CTRL-C to exit"
 echo ""
 sleep 5
@@ -36,7 +36,7 @@ do
     fi
 done
 if [ ! -d "$HOME/.android-certs" ]; then
-    read -n1 -r -p $"\$HOME/.android-certs not found - CTRL-C to exit, or any other key to continue"
+    echo "$HOME/.android-certs not found - output will not be signed"
     echo ""
     SIGNABLE=false
 fi
@@ -53,15 +53,23 @@ echo\
 
 START=`date +%s`
 BUILD_DATE="$(date -u +%Y%m%d)"
+LINEAGE_VERSION="23.2"
 
 prep_build() {
+    for repo in lineage_build_unified lineage_patches_unified; do
+        if [ "$(git -C "${repo}" branch --show-current)" != "lineage-23-td" ]; then
+            echo "${repo} must be checked out on lineage-23-td" >&2
+            exit 1
+        fi
+    done
+
     echo "Preparing local manifests"
     mkdir -p .repo/local_manifests
     cp ./lineage_build_unified/local_manifests_${MODE}/*.xml .repo/local_manifests
     echo ""
 
     echo "Syncing repos"
-    repo sync -c --force-sync --no-clone-bundle --no-tags -j$(nproc --all)
+    repo sync -c --force-sync --no-clone-bundle --no-tags --optimized-fetch --retry-fetches=5 -j8
     echo ""
 
     echo "Setting up build environment"
@@ -70,15 +78,20 @@ prep_build() {
     mkdir -p ~/build-output
     echo ""
 
-    repopick 321337 -r -f # Deprioritize important developer notifications
-    repopick 321338 -r -f # Allow disabling important developer notifications
-    repopick 321339 -r -f # Allow disabling USB notifications
-    repopick 368923 -r -f # Launcher3: Show clear all button in recents overview
+    : repopick 321337 -r -f # Deprioritize important developer notifications
+    : repopick 321338 -r -f # Allow disabling important developer notifications
+    : repopick 321339 -r -f # Allow disabling USB notifications
+    : repopick 368923 -r -f # Launcher3: Show clear all button in recents overview
 }
 
 apply_patches() {
+    local patch_dir="./lineage_patches_unified/${1}"
+    if [ ! -d "${patch_dir}" ]; then
+        echo "Patch group ${1} is absent - skipping"
+        return
+    fi
     echo "Applying patch group ${1}"
-    bash ./lineage_build_unified/apply_patches.sh ./lineage_patches_unified/${1}
+    bash ./lineage_build_unified/apply_patches.sh "${patch_dir}"
 }
 
 prep_device() {
@@ -111,7 +124,7 @@ finalize_treble() {
 
 build_device() {
     brunch ${1}
-    mv $OUT/lineage-*.zip ~/build-output/lineage-21.0-$BUILD_DATE-UNOFFICIAL-${1}$($PERSONAL && echo "-personal" || echo "").zip
+    mv $OUT/lineage-*.zip ~/build-output/lineage-$LINEAGE_VERSION-$BUILD_DATE-UNOFFICIAL-${1}$($PERSONAL && echo "-personal" || echo "").zip
 }
 
 build_treble() {
@@ -136,7 +149,7 @@ build_treble() {
         SIGNED=true
         echo ""
     fi
-    mv $OUT/system.img ~/build-output/lineage-21.0-$BUILD_DATE-UNOFFICIAL-${TARGET}$(${PERSONAL} && echo "-personal" || echo "")$(${SIGNED} && echo "-signed" || echo "").img
+    mv $OUT/system.img ~/build-output/lineage-$LINEAGE_VERSION-$BUILD_DATE-UNOFFICIAL-${TARGET}$(${PERSONAL} && echo "-personal" || echo "")$(${SIGNED} && echo "-signed" || echo "").img
     #make vndk-test-sepolicy
 }
 
