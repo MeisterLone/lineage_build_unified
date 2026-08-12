@@ -166,6 +166,17 @@ validate_treble_identity() {
             exit 1
         fi
     done
+
+    local unsupported_feature
+    for unsupported_feature in \
+        "$OUT/system/etc/permissions/android.hardware.telephony.gsm.xml" \
+        "$OUT/system/etc/permissions/android.hardware.telephony.ims.xml"
+    do
+        if [ -e "$unsupported_feature" ]; then
+            echo "Hardware feature validation failed: $unsupported_feature must be absent on the Wi-Fi C10" >&2
+            exit 1
+        fi
+    done
 }
 
 build_treble() {
