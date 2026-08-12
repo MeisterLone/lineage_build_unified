@@ -177,6 +177,17 @@ validate_treble_identity() {
             exit 1
         fi
     done
+
+    local required_feature
+    for required_feature in \
+        "$OUT/system/etc/permissions/android.hardware.location.xml" \
+        "$OUT/system/etc/permissions/android.hardware.location.gps.xml"
+    do
+        if [ ! -e "$required_feature" ]; then
+            echo "Hardware feature validation failed: $required_feature is required on the GPS-capable C10" >&2
+            exit 1
+        fi
+    done
 }
 
 build_treble() {
